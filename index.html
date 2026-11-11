@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Điều khiển đèn LED ESP32</title>
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 420px; margin: 40px auto; padding: 0 16px; text-align: center; }
+  input { width: 100%; padding: 8px; margin: 4px 0; box-sizing: border-box; }
+  button { padding: 12px 28px; font-size: 18px; margin: 8px; border: 0; border-radius: 8px; cursor: pointer; }
+  #on { background: #2e9e4f; color: #fff; }
+  #off { background: #c0392b; color: #fff; }
+  #connect { background: #2563eb; color: #fff; }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  #status { margin: 12px 0; font-weight: 600; }
+  #bulb { font-size: 80px; filter: grayscale(1); transition: filter .2s; }
+  #bulb.on { filter: none; }
+</style>
+</head>
+<body>
+  <h2>Điều khiển đèn LED ESP32</h2>
+  <div id="bulb">💡</div>
+
+  <input id="user" placeholder="MQTT username">
+  <input id="pass" type="password" placeholder="MQTT password">
+  <button id="connect">Kết nối</button>
+  <div id="status">Chưa kết nối</div>
+
+  <button id="on" disabled>BẬT</button>
+  <button id="off" disabled>TẮT</button>
+
+<script>
+  const HOST  = "k881181d.ala.asia-southeast1.emqxsl.com";
+  const WSS_PORT = 8084;           // cổng WebSocket TLS của EMQX Cloud
+  const TOPIC = "esp32/lamp";
+
+  let client = null;
+  const $ = id => document.getElementById(id);
+
+  $("connect").onclick = () => {
+    if (client) client.end(true);
+    $("status").textContent = "Đang kết nối...";
+    client = mqtt.connect(`wss://${HOST}:${WSS_PORT}/mqtt`, {
+      username: $("user").value,
+      password: $("pass").value,
+      clientId: "web-" + Math.random().toString(16).slice(2, 10),
+      reconnectPeriod: 3000
+    });
+
+    client.on("connect", () => {
+      $("status").textContent = "Đã kết nối broker ✔";
+      $("on").disabled = $("off").disabled = false;
+    });
+    client.on("error", e => $("status").textContent = "Lỗi: " + e.message);
+    client.on("close", () => {
+      $("status").textContent = "Mất kết nối";
+      $("on").disabled = $("off").disabled = true;
+    });
+  };
+
+  function send(state) {
+    if (!client || !client.connected) return;
+    client.publish(TOPIC, JSON.stringify({ led: state }));
+    $("bulb").classList.toggle("on", state === "on");
+  }
+  $("on").onclick  = () => send("on");
+  $("off").onclick = () => send("off");
+</script>
+</body>
+</html>

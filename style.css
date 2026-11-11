@@ -1,0 +1,154 @@
+:root {
+  --bg: #e6edf2;
+  --panel: #f7fafc;
+  --ink: #1d2b44;
+  --muted: #5d6b82;
+  --glass-off: #cfd8e1;
+  --metal: #8d99aa;
+  --lamp-on: #ffc83d;
+  --lamp-on-deep: #ff9f1c;
+  --ok: #1f9d6b;
+  --warn: #d98a00;
+  --bad: #c0392b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.panel {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px 28px 32px;
+  background: var(--panel);
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(29, 43, 68, 0.12);
+  transition: background 0.4s ease;
+}
+
+.panel[data-lamp="on"] {
+  background: #fffaf0;
+}
+
+/* Trạng thái kết nối */
+.conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e9eef4;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.conn-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--warn);
+}
+
+.conn[data-state="online"] .conn-dot { background: var(--ok); }
+.conn[data-state="offline"] .conn-dot { background: var(--bad); }
+
+/* Bóng đèn */
+.bulb {
+  width: 180px;
+  height: auto;
+  margin: 8px auto 0;
+  display: block;
+  overflow: visible;
+}
+
+.glow {
+  fill: var(--lamp-on);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.glass {
+  fill: var(--glass-off);
+  stroke: var(--metal);
+  stroke-width: 3;
+  transition: fill 0.4s ease, filter 0.4s ease;
+}
+
+.filament {
+  fill: none;
+  stroke: var(--metal);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.4s ease;
+}
+
+.base { fill: var(--metal); }
+
+.panel[data-lamp="on"] .glow { opacity: 0.35; }
+
+.panel[data-lamp="on"] .glass {
+  fill: var(--lamp-on);
+  filter: drop-shadow(0 0 18px var(--lamp-on-deep));
+}
+
+.panel[data-lamp="on"] .filament { stroke: var(--lamp-on-deep); }
+
+/* Chữ */
+h1 {
+  margin: 12px 0 4px;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.hint {
+  margin: 0 0 22px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* Nút bật/tắt */
+.toggle {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--ink);
+  color: #fff;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.toggle:hover:not(:disabled) { background: #2c3f63; }
+.toggle:active:not(:disabled) { transform: scale(0.98); }
+.toggle:focus-visible { outline: 3px solid var(--lamp-on-deep); outline-offset: 3px; }
+
+.toggle:disabled {
+  background: #aab4c3;
+  cursor: not-allowed;
+}
+
+.panel[data-lamp="on"] .toggle {
+  background: var(--lamp-on-deep);
+  color: #2b1a00;
+}
+
+.panel[data-lamp="on"] .toggle:hover:not(:disabled) { background: #f28f00; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
